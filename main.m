@@ -1,56 +1,72 @@
 %_______________________________________________________________________________________
-%  The Arithmetic Optimization Algorithm (AOA) source codes demo version 1.0                  
-%                                                                                       
-%  Developed in MATLAB R2015a (7.13)                                                    
-%                                                                                       
-%  Authors: Laith Abualigah, Ali Diabat, Seyedali Mirjalili, Mohamed Abd Elaziz, & Amir H. Gandomi                      
-%                                                                                       
-%  E-Mail: Aligah.2020@gmail.com  (Laith Abualigah)                                               
-%  Homepage:                                                                       
-%  1- https://scholar.google.com/citations?user=39g8fyoAAAAJ&hl=en               
-%  2- https://www.researchgate.net/profile/Laith_Abualigah                       
-%                                                                                      
-% Main paper:   The Arithmetic Optimization Algorithm
-% Reference: Abualigah, L., Diabat, A., Mirjalili, S., Abd Elaziz, M., and Gandomi, A. H. (2021). The Arithmetic Optimization Algorithm. Computer Methods in Applied Mechanics and Engineering.
-%
+%  AOA Batch Run Script (F1 - F23)
+%  此腳本會一次執行所有測試函數，繪製收斂曲線並列印最佳解。
 %_______________________________________________________________________________________
 
 clear all 
 clc
 
+Solution_no = 30;   % 搜尋代理人數量 (依照您的需求調整，原為20或30)
+M_Iter = 1000;      % 最大迭代次數
 
-Solution_no=20; %Number of search solutions
-F_name='F1';    %Name of the test function F1-f23
-M_Iter=1000;    %Maximum number of iterations
- 
-[LB,UB,Dim,F_obj]=Get_F(F_name); %Give details of the underlying benchmark function
+% 建立一個圖形視窗來畫收斂曲線
+figure('Name', 'All Functions Convergence Curves', 'Color', 'w');
 
-[Best_FF,Best_P,Conv_curve]=AOA(Solution_no,M_Iter,LB,UB,Dim,F_obj); % Call the AOA 
+% 用來儲存結果的變數
+All_Results = struct('Function', {}, 'Best_Score', {}, 'Best_Position', {});
 
- 
+disp('開始執行 F1 到 F23 ... 請稍候');
 
-figure('Position',[454   445   694   297]);
-subplot(1,2,1);
-func_plot(F_name);
-title('Parameter space')
-xlabel('x_1');
-ylabel('x_2');
-zlabel([F_name,'( x_1 , x_2 )'])
+for i = 1:23
+    % 1. 設定函數名稱 (F1, F2, ..., F23)
+    F_name = ['F', num2str(i)];
+    
+    % 2. 取得函數資訊
+    [LB, UB, Dim, F_obj] = Get_F(F_name);
+    
+    % 3. 執行 AOA 演算法
+    [Best_FF, Best_P, Conv_curve] = AOA(Solution_no, M_Iter, LB, UB, Dim, F_obj);
+    
+    % 4. 儲存結果
+    All_Results(i).Function = F_name;
+    All_Results(i).Best_Score = Best_FF;
+    All_Results(i).Best_Position = Best_P;
+    
+    % 5. 繪製收斂曲線 (使用 Subplot 排列)
+    % 安排成 5 列 5 行的網格 (共 25格，足夠放 23 個圖)
+    subplot(5, 5, i);
+    semilogy(Conv_curve, 'Color', 'r', 'LineWidth', 1.5);
+    title(F_name);
+    axis tight;
+    grid on;
+    
+    % 為了版面整潔，只在特定位置顯示軸標籤
+    if i > 20 
+        xlabel('Iter'); 
+    end
+    if mod(i, 5) == 1 
+        ylabel('Fitness'); 
+    end
+    
+    % 在指令視窗顯示進度
+    fprintf('Function %s Done. Best Score: %e\n', F_name, Best_FF);
+end
 
+% 調整圖形標題
+sgtitle('Convergence Curves for All Benchmark Functions (F1-F23)');
 
-subplot(1,2,2);
-semilogy(Conv_curve,'Color','r','LineWidth',2)
-title('Convergence curve')
-xlabel('Iteration#');
-ylabel('Best fitness function');
-axis tight
-legend('AOA')
+% 6. 最後一次印出所有函數的最佳解表格
+disp('-------------------------------------------------------');
+disp('           AOA Optimization Results Summary            ');
+disp('-------------------------------------------------------');
+fprintf('%-10s | %-25s\n', 'Function', 'Best Fitness Score');
+disp('-------------------------------------------------------');
 
-
-
-display(['The best-obtained solution by Math Optimizer is : ', num2str(Best_P)]);
-display(['The best optimal value of the objective funciton found by Math Optimizer is : ', num2str(Best_FF)]);
-
+for i = 1:23
+    % 使用 %e 科學記號顯示，因為數值差異可能很大
+    fprintf('%-10s | %-25.6e\n', All_Results(i).Function, All_Results(i).Best_Score);
+end
+disp('-------------------------------------------------------');
         
 
 
