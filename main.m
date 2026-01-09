@@ -22,7 +22,8 @@ for i = 1:23
     F_name = ['F', num2str(i)];
     
     % 2. 取得函數資訊
-    [LB, UB, Dim, F_obj] = Get_F(F_name);
+    [LB, UB, Dim ,F_obj] = Get_F(F_name);
+    
     
     % 3. 執行 AOA 演算法
     [Best_FF, Best_P, Conv_curve] = AOA(Solution_no, M_Iter, LB, UB, Dim, F_obj);
